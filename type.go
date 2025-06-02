@@ -4,8 +4,6 @@ package main
 // 	"github.com/hajimehoshi/ebiten/v2"
 // )
 
-type Game struct{}
-
 type Particle struct {
 	// x and y position
 	x, y int
