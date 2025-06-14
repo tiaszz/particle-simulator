@@ -5,32 +5,67 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	// "github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-type Game struct{}
+func (p *Particle) Update() {
+	// gravity
+	p.ay = Gravity
 
-func drawCircle(screen *ebiten.Image, cx, cy, r float64, clr color.Color) {
-	vector.DrawFilledCircle(screen, float32(cx), float32(cy), float32(r), clr, false) // Draw a filled circle
+	// update velocity
+	p.vx += p.ax * Dt
+	p.vy += p.ay * Dt
+
+	// update position
+	p.x += p.vx * Dt
+	p.y += p.vy * Dt
+
+	if p.x-10 < 0 {
+		p.x = 10
+		p.vx = -p.vx * 0.8
+	}
+
+	if p.x+10 > ScreenWidth {
+		p.x = ScreenWidth - 10
+		p.vx = -p.vx * 0.8
+	}
+
+	if p.y-10 < 0 {
+		p.y = 10
+		p.vy = -p.vy * 0.8
+	}
+
+	if p.y+10 > ScreenHeight {
+		p.y = ScreenHeight - 10
+		p.vy = -p.vy * 0.8
+	}
+
+	// reset acceleration
+	p.ax = 0
+	p.ay = 0
 }
 
 func (g *Game) Update() error {
+	g.particle.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	drawCircle(screen, 50, 50, 25, color.RGBA{R: 255, A: 255})
+	vector.DrawFilledCircle(screen, float32(g.particle.x), float32(g.particle.y), 10, color.RGBA{255, 0, 0, 255}, false)
 }
 
-func (g *Game) Layout(screenWidth, screenHeight int) (int, int) {
-	return screenWidth, screenHeight
+func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+	return 1280, 960
 }
 
 func main() {
-	ebiten.SetWindowSize(1280, 960)
-	ebiten.SetWindowTitle("Hello, World!")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	game := &Game{}
+	game.particle.x = ScreenWidth / 2
+	game.particle.y = ScreenHeight / 2
+
+	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
+	ebiten.SetWindowTitle("Particle simulator")
+	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
 }
