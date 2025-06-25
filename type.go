@@ -14,5 +14,6 @@ const (
 )
 
 type Game struct {
-	particle Particle
+	particle        []*Particle
+	isAttractorMode bool
 }
